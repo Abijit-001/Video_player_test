@@ -5,9 +5,9 @@ import 'package:vdocipher_flutter/vdocipher_flutter.dart';
 
 class VdoPlaybackView extends StatefulWidget {
   final bool controls;
-  final EmbedInfo? embedInfo;
+  final EmbedInfo embedInfo;
 
-  const VdoPlaybackView({Key? key, this.embedInfo, this.controls = true})
+  const VdoPlaybackView({Key key, this.embedInfo, this.controls = true})
       : super(key: key);
 
   @override
@@ -15,15 +15,15 @@ class VdoPlaybackView extends StatefulWidget {
 }
 
 class VdoPlaybackViewState extends State<VdoPlaybackView> {
-  VdoPlayerController? _controller;
+  VdoPlayerController _controller;
   final double aspectRatio = 16 / 9;
-  VdoPlayerValue? vdoPlayerValue;
+  VdoPlayerValue vdoPlayerValue;
   final ValueNotifier<bool> _isFullScreen = ValueNotifier(false);
 
   @override
   Widget build(BuildContext context) {
-    String? mediaId = ModalRoute.of(context)?.settings.arguments as String?;
-    EmbedInfo? embedInfo = widget.embedInfo;
+    String mediaId = ModalRoute.of(context)?.settings.arguments as String;
+    EmbedInfo embedInfo = widget.embedInfo;
     if (mediaId != null && mediaId.isNotEmpty) {
       embedInfo = EmbedInfo.offline(mediaId: mediaId);
     }
@@ -38,7 +38,7 @@ class VdoPlaybackViewState extends State<VdoPlaybackView> {
                       width: _getPlayerWidth(),
                       height: _getPlayerHeight(),
                       child: VdoPlayer(
-                        embedInfo: embedInfo!,
+                        embedInfo: embedInfo,
                         aspectRatio: aspectRatio,
                         onError: _onVdoError,
                         onFullscreenChange: _onFullscreenChange,
@@ -80,15 +80,15 @@ class VdoPlaybackViewState extends State<VdoPlaybackView> {
     }
   }
 
-  _onPlayerCreated(VdoPlayerController? controller) {
+  _onPlayerCreated(VdoPlayerController controller) {
     setState(() {
       _controller = controller;
       _onEventChange(_controller);
     });
   }
 
-  _onEventChange(VdoPlayerController? controller) {
-    controller!.addListener(() {
+  _onEventChange(VdoPlayerController controller) {
+    controller.addListener(() {
       VdoPlayerValue value = controller.value;
       setState(() {
         vdoPlayerValue = value;
@@ -104,11 +104,11 @@ class VdoPlaybackViewState extends State<VdoPlaybackView> {
     });
   }
 
-  _printProperties(VdoPlayerController? controller) async {
-    int? totalPlayed =
-        await controller?.getPlaybackProperty("totalPlayed") as int?;
-    int? totalCovered =
-        await controller?.getPlaybackProperty("totalCovered") as int?;
+  _printProperties(VdoPlayerController controller) async {
+    int totalPlayed =
+        await controller?.getPlaybackProperty("totalPlayed") as int;
+    int totalCovered =
+        await controller?.getPlaybackProperty("totalCovered") as int;
     if (kDebugMode) {
       print("VdoControllerListener"
           "\ntotalPlayed: $totalPlayed "

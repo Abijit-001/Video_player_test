@@ -17,7 +17,7 @@ class Sample {
 }
 
 class VdoDownloadView extends StatefulWidget {
-  const VdoDownloadView({Key? key}) : super(key: key);
+  const VdoDownloadView({Key key}) : super(key: key);
 
   @override
   State<VdoDownloadView> createState() => _VdoDownloadViewState();
@@ -25,7 +25,7 @@ class VdoDownloadView extends StatefulWidget {
 
 class _VdoDownloadViewState extends State<VdoDownloadView>
     implements EventListener {
-  DownloadOptions? downloadOptions;
+  DownloadOptions downloadOptions;
   VdoDownloadManager vdoDownloadManager = VdoDownloadManager.getInstance();
 
   final List<DownloadStatus> _downloadStatues = List.empty(growable: true);
@@ -216,7 +216,7 @@ class _VdoDownloadViewState extends State<VdoDownloadView>
                         height: 60,
                         child: (downloadStatus.poster != null)
                             ? Image.file(
-                                File.fromUri(Uri.file(downloadStatus.poster!)))
+                                File.fromUri(Uri.file(downloadStatus.poster)))
                             : const SizedBox.shrink()),
                     const SizedBox(
                       width: 10,
@@ -225,7 +225,7 @@ class _VdoDownloadViewState extends State<VdoDownloadView>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(downloadStatus.mediaInfo.title!),
+                          Text(downloadStatus.mediaInfo.title),
                           Text(
                               "${downloadStatus.mediaInfo.duration.inSeconds.toString()} s")
                         ],
@@ -319,7 +319,7 @@ class _VdoDownloadViewState extends State<VdoDownloadView>
         ),
         context: context,
         builder: (BuildContext context) {
-          DownloadOptions? downloadOptions;
+          DownloadOptions downloadOptions;
           int selectedIndex = -1;
           return StatefulBuilder(builder: (context, setState) {
             if (downloadOptions == null) {
@@ -369,14 +369,14 @@ class _VdoDownloadViewState extends State<VdoDownloadView>
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             scrollDirection: Axis.vertical,
-                            itemCount: downloadOptions!.allVideo.length,
+                            itemCount: downloadOptions.allVideo.length,
                             itemBuilder: (_, index) {
                               int totalBitrate =
-                                  downloadOptions!.allVideo[index].bitrate! +
-                                      downloadOptions!.allAudio[0].bitrate!;
+                                  downloadOptions.allVideo[index].bitrate +
+                                      downloadOptions.allAudio[0].bitrate;
                               String mediaSize = Utils.mediaSize(
                                   totalBitrate,
-                                  downloadOptions!
+                                  downloadOptions
                                       .mediaInfo.duration.inMilliseconds);
                               return SizedBox(
                                 width: MediaQuery.of(context).size.width,
@@ -411,7 +411,7 @@ class _VdoDownloadViewState extends State<VdoDownloadView>
                                 }
                                 DownloadSelections downloadSelections =
                                     DownloadSelections(
-                                        downloadOptions!, selectedIndex, 0);
+                                        downloadOptions, selectedIndex, 0);
                                 onTrackSelection(downloadSelections);
                                 Navigator.of(context).pop();
                               },

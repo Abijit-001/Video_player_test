@@ -8,15 +8,13 @@ import 'package:vdocipher_flutter/vdocipher_flutter.dart';
 
 /// VdoPlayer controls created with [VdoPlayerController] to control playback and returns [onFullscreenChange] callback function
 class VdoCustomControllerView extends StatefulWidget {
-  final VdoPlayerController? controller;
-  final Function(bool)? onFullscreenChange;
+  final VdoPlayerController controller;
+  final Function(bool) onFullscreenChange;
   final Function(VdoError vdoError) onError;
 
   const VdoCustomControllerView(
-      {Key? key,
-      required this.controller,
-      this.onFullscreenChange,
-      required this.onError})
+      {Key key, this.controller,
+      this.onFullscreenChange, this.onError})
       : super(key: key);
 
   @override
@@ -25,8 +23,8 @@ class VdoCustomControllerView extends StatefulWidget {
 
 class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
     with WidgetsBindingObserver {
-  late VdoPlayerValue _playerValue;
-  late Size _windowSize;
+   VdoPlayerValue _playerValue;
+   Size _windowSize;
   bool _isVisibleControls = true;
   final double _iconSize = 40.0;
   final double _smallIconSize = 30.0;
@@ -34,12 +32,12 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
   double _currentPlaybackTime = 0;
   bool _isScrubbing = false;
   bool _currentLoadingState = false;
-  Timer? _hideTimer;
+  Timer _hideTimer;
 
   @override
   void initState() {
     super.initState();
-    widget.controller!.addListener(_updatePlayerState);
+    widget.controller.addListener(_updatePlayerState);
     _updatePlayerState();
 
     // If time not started and video is not in loading state then start timer
@@ -52,7 +50,7 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
 
   @override
   void dispose() {
-    widget.controller!.removeListener(_updatePlayerState);
+    widget.controller.removeListener(_updatePlayerState);
     _portraitScreen();
 
     WidgetsBinding.instance.removeObserver(this);
@@ -64,7 +62,7 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // When App Goes to background
     if (state == AppLifecycleState.paused) {
-      widget.controller!.removeListener(_updatePlayerState);
+      widget.controller.removeListener(_updatePlayerState);
 
       // If Full screen mode then exit to normal
       if (_isFullScreenMode) {
@@ -73,14 +71,14 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
 
       // When App comes to foreground
     } else if (state == AppLifecycleState.resumed) {
-      widget.controller!.addListener(_updatePlayerState);
+      widget.controller.addListener(_updatePlayerState);
       _updatePlayerState();
     }
   }
 
   _updatePlayerState() {
     setState(() {
-      _playerValue = widget.controller!.value;
+      _playerValue = widget.controller.value;
       if (!_isScrubbing && !_playerValue.isBuffering) {
         double playerPosition = _playerValue.position.inMilliseconds.toDouble();
         double playbackDuration =
@@ -199,7 +197,7 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
   }
 
   void _cancelAndRestartTimer() {
-    _hideTimer?.cancel();
+    _hideTimer  .cancel();
 
     if (!mounted) {
       return;
@@ -213,7 +211,7 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
     // Hide controls after 3 seconds
     _hideTimer = Timer(const Duration(seconds: 3), () {
       // if video not playing then don't hide controls
-      if (!widget.controller!.isPlaying) {
+      if (!widget.controller.isPlaying) {
         return;
       }
 
@@ -258,13 +256,13 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
   }
 
   _errorInfo() {
-    widget.onError(_playerValue.vdoError!); // VdoError callback
+    widget.onError(_playerValue.vdoError); // VdoError callback
 
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Icon(Icons.error, size: _smallIconSize, color: Colors.white),
-      Text('Error code: ${_playerValue.vdoError!.code}',
+      Text('Error code: ${_playerValue.vdoError.code}',
           style: const TextStyle(fontSize: 16, color: Colors.white)),
-      Text(_playerValue.vdoError!.message,
+      Text(_playerValue.vdoError.message,
           style: const TextStyle(fontSize: 16, color: Colors.white))
     ]);
   }
@@ -301,7 +299,7 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
               inactiveColor: Colors.grey,
               onChangeStart: (val) {
                 _isScrubbing = true;
-                _hideTimer?.cancel();
+                _hideTimer  .cancel();
               },
               onChanged: (val) {
                 setState(() {
@@ -309,7 +307,7 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
                 });
               },
               onChangeEnd: (val) {
-                widget.controller!
+                widget.controller
                     .seek(Duration(milliseconds: val.round()))
                     .then((value) => {
                           Future.delayed(const Duration(milliseconds: 500), () {
@@ -368,7 +366,7 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
       items.add(_buildTrackModalItem(label, () {
         Navigator.pop(context);
         if (!isSelected) {
-          widget.controller!.setPlaybackSpeed(i);
+          widget.controller  .setPlaybackSpeed(i);
         }
       }));
     }
@@ -378,19 +376,19 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
 
   _showSubtitleOptions() {
     final List<SubtitleTrack> subtitleTracks = _playerValue.subtitleTracks;
-    final SubtitleTrack? selectedSubtitleTrack = _playerValue.subtitleTrack;
+    final SubtitleTrack   selectedSubtitleTrack = _playerValue.subtitleTrack;
     final List<Widget> items = [];
 
     for (SubtitleTrack track in subtitleTracks) {
       final bool isSelected = track == selectedSubtitleTrack;
 
-      final String? language = track.language;
+      final String   language = track.language;
       final String isSelectedMsg = isSelected ? ("✔️") : "";
       final String itemName = "$language $isSelectedMsg";
       items.add(_buildTrackModalItem(itemName, () {
         Navigator.pop(context);
         if (!isSelected) {
-          widget.controller!.setSubtitleLanguage(track.language);
+          widget.controller  .setSubtitleLanguage(track.language);
         }
       }));
     }
@@ -403,7 +401,7 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
           0,
           _buildTrackModalItem("Off $isSelectedMsg", () {
             Navigator.pop(context);
-            widget.controller!.setSubtitleLanguage(null);
+            widget.controller  .setSubtitleLanguage(null);
           }));
     } else if (items.isEmpty) {
       items.add(_buildTrackModalItem("Off", () {
@@ -416,14 +414,14 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
 
   _showQualityOptions() {
     final List<VideoTrack> videoTracks = _playerValue.videoTracks;
-    final VideoTrack? selectedVideo = _playerValue.videoTrack;
+    final VideoTrack   selectedVideo = _playerValue.videoTrack;
     final bool isAdaptive = _playerValue.isAdaptive;
     final List<Widget> items = [];
 
     for (VideoTrack track in videoTracks) {
       final bool isSelected = track == selectedVideo;
 
-      final int totalBitrateKbps = track.bitrate! ~/ 1024;
+      final int totalBitrateKbps = track.bitrate   ~/ 1024;
       final String isAdaptiveMsg = isAdaptive ? " (Auto)" : "";
       final String isSelectedMsg = isSelected ? ("$isAdaptiveMsg  ✔️") : "";
       final String itemName =
@@ -431,7 +429,7 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
       items.add(_buildTrackModalItem(itemName, () {
         Navigator.pop(context);
         if (!isSelected) {
-          widget.controller!.setVideoTrack(track);
+          widget.controller  .setVideoTrack(track);
         }
       }));
     }
@@ -442,7 +440,7 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
           0,
           _buildTrackModalItem("Auto", () {
             Navigator.pop(context);
-            widget.controller!.setAdaptive();
+            widget.controller  .setAdaptive();
           }));
     } else if (items.isEmpty) {
       items.add(_buildTrackModalItem("Auto", () {
@@ -455,7 +453,7 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
 
   _buildTrackModalItem(String text, Function onTap) {
     return InkWell(
-        onTap: onTap as void Function()?,
+        onTap: onTap as void Function()  ,
         child: Container(
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.all(10),
@@ -481,28 +479,28 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
     }
 
     if (_playerValue.isEnded) {
-      widget.controller!.seek(Duration.zero);
-      widget.controller!.play();
+      widget.controller  .seek(Duration.zero);
+      widget.controller  .play();
     } else if (_playerValue.isPlaying) {
-      widget.controller!.pause();
+      widget.controller  .pause();
     } else {
-      widget.controller!.play();
+      widget.controller  .play();
     }
   }
 
   _seekTo(Duration interval) async {
-    Duration currentPosition = await widget.controller!.getPosition();
-    widget.controller!.seek(currentPosition + interval);
+    Duration currentPosition = await widget.controller  .getPosition();
+    widget.controller  .seek(currentPosition + interval);
   }
 
-  Container _navItem({Function? onClick, IconData? iconData}) {
+  Container _navItem({Function   onClick, IconData   iconData}) {
     return Container(
         margin: const EdgeInsets.only(left: 5.0, right: 5.0),
         child: InkWell(
           hoverColor: Colors.transparent,
           highlightColor: Colors.transparent,
           splashColor: Colors.transparent,
-          onTap: onClick as void Function()?,
+          onTap: onClick as void Function()  ,
           child: Icon(
             iconData,
             size: _smallIconSize,
@@ -517,7 +515,7 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
     });
 
     if (widget.onFullscreenChange != null) {
-      widget.onFullscreenChange!(_isFullScreenMode);
+      widget.onFullscreenChange  (_isFullScreenMode);
     }
 
     if (_isFullScreenMode) {
@@ -536,7 +534,7 @@ class _VdoCustomControllerViewState extends State<VdoCustomControllerView>
   }
 
   /// Combined data expenditure in MB/hr or GB/hr
-  String _combinedDataExpenditurePerHour(VideoTrack video, AudioTrack? audio) {
+  String _combinedDataExpenditurePerHour(VideoTrack video, AudioTrack   audio) {
     int videoBitrate = video.bitrate ?? 0;
     int audioBitrate = audio != null ? (audio.bitrate ?? 0) : 0;
     return _dataExpenditurePerHour(videoBitrate + audioBitrate);
